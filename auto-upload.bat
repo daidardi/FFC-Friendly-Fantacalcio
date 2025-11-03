@@ -7,7 +7,7 @@ if errorlevel 1 (
     git commit -m "Commit automatico prima del pull"
 )
 
-git pull origin main --rebase  REM Usa --rebase per riordinare commit invece di merge
+git pull origin main --rebase
 
 git add .
 git diff-index --quiet HEAD --
