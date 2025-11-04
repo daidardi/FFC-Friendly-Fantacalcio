@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penalità FFC 2025/2026</title>
+    <style>
+        /* Reset e base */
+        * { box-sizing: border-box; margin:0; padding:0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #000;
+            padding: 10px;
+            line-height: 1.4;
+        }
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #1e40af;
+        }
+
+        /* Contenitore responsive */
+        .container {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+
+        /* Tabella mobile: diventa lista */
+        @media (max-width: 600px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr { display: none; }
+            tr {
+                margin-bottom: 20px;
+                border: 2px solid #2563eb;
+                border-radius: 10px;
+                padding: 12px;
+                background: #eff6ff;
+            }
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+            td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 12px;
+                width: 45%;
+                font-weight: bold;
+                color: #1e40af;
+                text-align: left;
+            }
+        }
+
+        /* Stile per desktop (mantiene aspetto originale) */
+        @media (min-width: 601px) {
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 15px;
+            }
+            th, td {
+                padding: 8px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+            th {
+                background: #1e40af;
+                color: white;
+            }
+        }
+
+        .player {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #1d4ed8;
+            margin: 15px 0 8px;
+        }
+        .detail {
+            font-style: italic;
+            color: #555;
+        }
+        .total {
+            font-weight: bold;
+            color: #dc2626;
+            font-size: 1.1rem;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Penalità FFC 2025/2026</h1>
+
+    <div class="container">
+        <table>
+            <!-- GIOCATORE 1 -->
+            <tr>
+                <td data-label="Giocatore">Antongiulio Minenna - Zullo</td>
+            </tr>
+            <tr>
+                <td data-label="Tipo" class="detail">- Campionato</td>
+            </tr>
+            <tr>
+                <td data-label="Dettaglio" class="detail">- Giornata 8: 28/10/2025</td>
+            </tr>
+            <tr>
+                <td data-label="Totale" class="total">Totale ricorrenze: 1 | Importo: 2,00 €</td>
+            </tr>
+
+            <!-- GIOCATORE 2 -->
+            <tr>
+                <td data-label="Giocatore">Antonio Miraglia - Archisquadra</td>
+            </tr>
+            <tr>
+                <td data-label="Tipo" class="detail">- Campionato</td>
+            </tr>
+            <tr>
+                <td data-label="Dettaglio" class="detail">- Giornata 8: 28/10/2025</td>
+            </tr>
+            <tr>
+                <td data-label="Totale" class="total">Totale ricorrenze: 1 | Importo: 2,00 €</td>
+            </tr>
+        </table>
+    </div>
+
+    <p style="text-align:center; margin-top:20px; font-size:0.9rem; color:#666;">
+        Aggiornato al 04/11/2025
+    </p>
+
+</body>
+</html>
