@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campionato FFC 2025/26 — Statistiche</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+–bg: #0c0e14;
+–surface: #141720;
+–card: #1a1e2e;
+–border: #252a3d;
+–gold: #f5c842;
+–silver: #b0bec5;
+–bronze: #cd7f32;
+–accent: #4f8ef7;
+–green: #30d474;
+–red: #f05454;
+–draw: #f5c842;
+–text: #e8eaf0;
+–muted: #6b7280;
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(–bg); color: var(–text); font-family: ‘DM Sans’, sans-serif; min-height: 100vh; }
+
+/* HEADER */
+header {
+background: linear-gradient(135deg, #0c0e14 0%, #1a1e2e 50%, #0f1320 100%);
+border-bottom: 1px solid var(–border);
+padding: 2rem 2rem 1.5rem;
+position: relative;
+overflow: hidden;
+}
+header::before {
+content: ‘FFC’;
+position: absolute;
+right: -20px;
+top: -20px;
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 12rem;
+color: rgba(79,142,247,0.04);
+line-height: 1;
+user-select: none;
+}
+.header-inner { max-width: 1300px; margin: 0 auto; display: flex; align-items: center; gap: 1.5rem; }
+.badge {
+width: 64px; height: 64px; border-radius: 16px;
+background: linear-gradient(135deg, var(–gold), #e8a800);
+display: flex; align-items: center; justify-content: center;
+font-family: ‘Bebas Neue’, sans-serif; font-size: 1.6rem; color: #0c0e14;
+flex-shrink: 0; box-shadow: 0 0 30px rgba(245,200,66,0.3);
+}
+header h1 { font-family: ‘Bebas Neue’, sans-serif; font-size: 2.4rem; letter-spacing: 2px; line-height: 1.1; }
+header p { color: var(–muted); font-size: 0.85rem; margin-top: 0.3rem; }
+.rounds-badge {
+margin-left: auto; background: var(–card); border: 1px solid var(–border);
+border-radius: 12px; padding: 0.5rem 1rem; text-align: center; flex-shrink: 0;
+}
+.rounds-badge .num { font-family: ‘Bebas Neue’, sans-serif; font-size: 2rem; color: var(–accent); }
+.rounds-badge .lbl { font-size: 0.7rem; color: var(–muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* TABS */
+.tabs { background: var(–surface); border-bottom: 1px solid var(–border); position: sticky; top: 0; z-index: 100; }
+.tabs-inner { max-width: 1300px; margin: 0 auto; display: flex; gap: 0; }
+.tab { padding: 1rem 1.5rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(–muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid transparent; transition: all 0.2s; }
+.tab:hover { color: var(–text); }
+.tab.active { color: var(–accent); border-bottom-color: var(–accent); }
+
+/* CONTENT */
+.content { max-width: 1300px; margin: 0 auto; padding: 2rem; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* CARDS */
+.card { background: var(–card); border: 1px solid var(–border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+.card-title { font-family: ‘Bebas Neue’, sans-serif; font-size: 1.2rem; letter-spacing: 1.5px; color: var(–muted); margin-bottom: 1rem; text-transform: uppercase; }
+
+/* TOP 3 PODIO */
+.podium { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+.podium-item { flex: 1; border-radius: 16px; padding: 1.5rem; text-align: center; position: relative; overflow: hidden; border: 1px solid; }
+.podium-item.gold { background: linear-gradient(145deg, rgba(245,200,66,0.12), rgba(245,200,66,0.04)); border-color: rgba(245,200,66,0.3); }
+.podium-item.silver { background: linear-gradient(145deg, rgba(176,190,197,0.10), rgba(176,190,197,0.03)); border-color: rgba(176,190,197,0.25); }
+.podium-item.bronze { background: linear-gradient(145deg, rgba(205,127,50,0.10), rgba(205,127,50,0.03)); border-color: rgba(205,127,50,0.25); }
+.podium-rank { font-family: ‘Bebas Neue’, sans-serif; font-size: 3.5rem; line-height: 1; }
+.gold .podium-rank { color: var(–gold); }
+.silver .podium-rank { color: var(–silver); }
+.bronze .podium-rank { color: var(–bronze); }
+.podium-team { font-size: 1rem; font-weight: 600; margin: 0.4rem 0 0.2rem; }
+.podium-pts { font-family: ‘Bebas Neue’, sans-serif; font-size: 2rem; }
+.gold .podium-pts { color: var(–gold); }
+.silver .podium-pts { color: var(–silver); }
+.bronze .podium-pts { color: var(–bronze); }
+.podium-sub { font-size: 0.72rem; color: var(–muted); }
+
+/* CLASSIFICA TABLE */
+.standings-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.standings-table th { padding: 0.6rem 0.8rem; text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(–muted); font-weight: 600; border-bottom: 1px solid var(–border); }
+.standings-table td { padding: 0.75rem 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.standings-table tr:last-child td { border-bottom: none; }
+.standings-table tr:hover td { background: rgba(79,142,247,0.04); }
+.rank-num { font-family: ‘Bebas Neue’, sans-serif; font-size: 1.2rem; color: var(–muted); width: 36px; }
+.rank-1 { color: var(–gold); }
+.rank-2 { color: var(–silver); }
+.rank-3 { color: var(–bronze); }
+.team-name { font-weight: 600; }
+.pts-cell { font-family: ‘Bebas Neue’, sans-serif; font-size: 1.3rem; color: var(–accent); }
+.gd-pos { color: var(–green); }
+.gd-neg { color: var(–red); }
+.gd-zero { color: var(–muted); }
+
+/* FORM PILLS */
+.form { display: flex; gap: 3px; }
+.form-pill { width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; }
+.form-W { background: rgba(48,212,116,0.2); color: var(–green); }
+.form-D { background: rgba(245,200,66,0.2); color: var(–draw); }
+.form-L { background: rgba(240,84,84,0.2); color: var(–red); }
+
+/* MINI BARS */
+.bar-wrap { display: flex; align-items: center; gap: 6px; }
+.bar-bg { flex: 1; height: 5px; background: var(–border); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; }
+.bar-val { font-size: 0.78rem; color: var(–text); min-width: 24px; text-align: right; }
+
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .podium { flex-direction: column; } }
+
+/* STAT CARDS */
+.stat-row { display: flex; flex-direction: column; gap: 0.75rem; }
+.stat-item { display: flex; align-items: center; gap: 0.75rem; }
+.stat-item .srank { font-family: ‘Bebas Neue’, sans-serif; font-size: 1rem; color: var(–muted); width: 22px; flex-shrink: 0; }
+.stat-item .sname { flex: 1; font-size: 0.85rem; font-weight: 500; }
+.stat-item .sval { font-family: ‘Bebas Neue’, sans-serif; font-size: 1.1rem; color: var(–accent); }
+
+/* RISULTATI */
+.results-round { margin-bottom: 1.5rem; }
+.round-header { font-family: ‘Bebas Neue’, sans-serif; letter-spacing: 2px; font-size: 0.9rem; color: var(–muted); margin-bottom: 0.5rem; }
+.match-list { display: flex; flex-direction: column; gap: 6px; }
+.match-row { display: flex; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(–border); border-radius: 10px; padding: 0.6rem 1rem; font-size: 0.85rem; }
+.match-home { flex: 1; text-align: right; font-weight: 500; }
+.match-score { width: 80px; text-align: center; font-family: ‘Bebas Neue’, sans-serif; font-size: 1.1rem; color: var(–text); flex-shrink: 0; }
+.match-away { flex: 1; font-weight: 500; }
+.match-pts { font-size: 0.7rem; color: var(–muted); width: 80px; text-align: center; flex-shrink: 0; }
+.w-color { color: var(–green); }
+.l-color { color: var(–red); }
+
+/* CHARTS */
+.chart-wrap { position: relative; height: 320px; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(–bg); }
+::-webkit-scrollbar-thumb { background: var(–border); border-radius: 3px; }
+
+/* FILTER */
+.filter-select {
+background: var(–surface); border: 1px solid var(–border); color: var(–text);
+border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.85rem; cursor: pointer;
+font-family: ‘DM Sans’, sans-serif;
+}
+
+.highlight-row td { background: rgba(245,200,66,0.05) !important; }
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="badge">FFC</div>
+    <div>
+      <h1>Campionato FFC 2025/26</h1>
+      <p>Fantacalcio · Statistiche aggiornate</p>
+    </div>
+    <div class="rounds-badge">
+      <div class="num">31</div>
+      <div class="lbl">Giornate giocate</div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tabs-inner">
+    <div class="tab active" onclick="showTab('classifica')">🏆 Classifica</div>
+    <div class="tab" onclick="showTab('andamento')">📈 Andamento</div>
+    <div class="tab" onclick="showTab('statistiche')">📊 Statistiche</div>
+    <div class="tab" onclick="showTab('risultati')">⚽ Risultati</div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- CLASSIFICA -->
+
+<div class="section active" id="classifica">
+  <div class="podium" id="podium"></div>
+  <div class="card">
+    <div class="card-title">Classifica Completa</div>
+    <table class="standings-table" id="standingsTable"></table>
+  </div>
+</div>
+
+<!-- ANDAMENTO -->
+
+<div class="section" id="andamento">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+      <div class="card-title" style="margin-bottom:0;">Andamento Punti — Tutte le squadre</div>
+      <select class="filter-select" id="teamFilter" onchange="updateProgressionChart()">
+        <option value="all">Tutte le squadre</option>
+      </select>
+    </div>
+    <div class="chart-wrap"><canvas id="progressionChart"></canvas></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Media Fantapunti per Giornata</div>
+      <div class="chart-wrap"><canvas id="avgPtsChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Distribuzione W/D/L</div>
+      <div class="chart-wrap"><canvas id="wdlChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- STATISTICHE -->
+
+<div class="section" id="statistiche">
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">⚽ Gol Fatti</div>
+      <div class="stat-row" id="goalsScoredList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🛡️ Miglior Difesa</div>
+      <div class="stat-row" id="goalsConcededList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🎯 Media Fantapunti</div>
+      <div class="stat-row" id="avgFptsList"></div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📊 Gol Fatti vs Subiti</div>
+      <div class="chart-wrap"><canvas id="goalBarChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">💡 Record &amp; Curiosità</div>
+      <div id="recordsList" style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.5rem;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RISULTATI -->
+
+<div class="section" id="risultati">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+    <select class="filter-select" id="resultTeamFilter" onchange="renderResults()">
+      <option value="all">Tutte le squadre</option>
+    </select>
+  </div>
+  <div id="resultsList"></div>
+</div>
+
+</div>
+
+<script>
+const DATA = {"standings": [{"rank": 1, "team": "Ac Derbolina", "pts": 59, "p": 31, "w": 18, "d": 5, "l": 8, "gf": 68, "ga": 43, "gd": 25, "fpts_for": 2260.5, "fpts_ag": 2134.0, "avg_fpts": 72.92, "form": ["W", "D", "L", "L", "L"]}, {"rank": 2, "team": "AS Tigre", "pts": 51, "p": 31, "w": 15, "d": 6, "l": 10, "gf": 73, "ga": 59, "gd": 14, "fpts_for": 2271.5, "fpts_ag": 2207.0, "avg_fpts": 73.27, "form": ["W", "W", "D", "L", "L"]}, {"rank": 3, "team": "Archisquadra", "pts": 48, "p": 31, "w": 14, "d": 6, "l": 11, "gf": 61, "ga": 41, "gd": 20, "fpts_for": 2205.0, "fpts_ag": 2153.0, "avg_fpts": 71.13, "form": ["W", "L", "W", "D", "W"]}, {"rank": 4, "team": "Albinoloffie Fc", "pts": 45, "p": 31, "w": 13, "d": 6, "l": 12, "gf": 69, "ga": 62, "gd": 7, "fpts_for": 2260.0, "fpts_ag": 2236.5, "avg_fpts": 72.9, "form": ["W", "W", "L", "W", "W"]}, {"rank": 5, "team": "Celta Vino", "pts": 41, "p": 31, "w": 10, "d": 11, "l": 10, "gf": 54, "ga": 51, "gd": 3, "fpts_for": 2210.0, "fpts_ag": 2177.5, "avg_fpts": 71.29, "form": ["D", "D", "L", "D", "W"]}, {"rank": 6, "team": "Mai Una Gioia", "pts": 41, "p": 31, "w": 11, "d": 8, "l": 12, "gf": 40, "ga": 57, "gd": -17, "fpts_for": 2129.0, "fpts_ag": 2201.5, "avg_fpts": 68.68, "form": ["L", "L", "W", "W", "W"]}, {"rank": 7, "team": "I Mugiwara", "pts": 40, "p": 31, "w": 12, "d": 4, "l": 15, "gf": 47, "ga": 70, "gd": -23, "fpts_for": 2180.0, "fpts_ag": 2238.0, "avg_fpts": 70.32, "form": ["L", "W", "D", "W", "L"]}, {"rank": 8, "team": "Taghazout", "pts": 37, "p": 31, "w": 10, "d": 7, "l": 14, "gf": 57, "ga": 61, "gd": -4, "fpts_for": 2210.0, "fpts_ag": 2232.0, "avg_fpts": 71.29, "form": ["D", "D", "W", "L", "D"]}, {"rank": 9, "team": "PANTHERS", "pts": 37, "p": 31, "w": 10, "d": 7, "l": 14, "gf": 46, "ga": 59, "gd": -13, "fpts_for": 2139.0, "fpts_ag": 2228.0, "avg_fpts": 69.0, "form": ["L", "D", "W", "W", "D"]}, {"rank": 10, "team": "zullo", "pts": 33, "p": 31, "w": 9, "d": 6, "l": 16, "gf": 39, "ga": 51, "gd": -12, "fpts_for": 2115.0, "fpts_ag": 2172.5, "avg_fpts": 68.23, "form": ["L", "L", "L", "L", "L"]}], "matches": [{"round": 1, "home": "Ac Derbolina", "away": "Taghazout", "home_goals": 4, "away_goals": 3, "home_pts": 80.5, "away_pts": 75.0}, {"round": 1, "home": "Celta Vino", "away": "PANTHERS", "home_goals": 3, "away_goals": 1, "home_pts": 76.0, "away_pts": 66.5}, {"round": 1, "home": "AS Tigre", "away": "Archisquadra", "home_goals": 0, "away_goals": 2, "home_pts": 63.0, "away_pts": 73.0}, {"round": 1, "home": "zullo", "away": "I Mugiwara", "home_goals": 2, "away_goals": 0, "home_pts": 73.0, "away_pts": 63.0}, {"round": 1, "home": "Albinoloffie Fc", "away": "Mai Una Gioia", "home_goals": 0, "away_goals": 3, "home_pts": 65.5, "away_pts": 76.0}, {"round": 2, "home": "Archisquadra", "away": "Albinoloffie Fc", "home_goals": 2, "away_goals": 1, "home_pts": 74.5, "away_pts": 69.5}, {"round": 2, "home": "I Mugiwara", "away": "AS Tigre", "home_goals": 4, "away_goals": 0, "home_pts": 80.5, "away_pts": 60.0}, {"round": 2, "home": "PANTHERS", "away": "Ac Derbolina", "home_goals": 0, "away_goals": 2, "home_pts": 56.5, "away_pts": 74.0}, {"round": 2, "home": "Taghazout", "away": "zullo", "home_goals": 6, "away_goals": 2, "home_pts": 86.0, "away_pts": 74.5}, {"round": 2, "home": "Mai Una Gioia", "away": "Celta Vino", "home_goals": 0, "away_goals": 1, "home_pts": 65.5, "away_pts": 69.5}, {"round": 3, "home": "Ac Derbolina", "away": "Mai Una Gioia", "home_goals": 4, "away_goals": 0, "home_pts": 79.5, "away_pts": 60.0}, {"round": 3, "home": "Celta Vino", "away": "Archisquadra", "home_goals": 1, "away_goals": 0, "home_pts": 70.5, "away_pts": 63.0}, {"round": 3, "home": "zullo", "away": "PANTHERS", "home_goals": 0, "away_goals": 0, "home_pts": 67.0, "away_pts": 65.0}, {"round": 3, "home": "Taghazout", "away": "I Mugiwara", "home_goals": 6, "away_goals": 1, "home_pts": 84.0, "away_pts": 69.5}, {"round": 3, "home": "Albinoloffie Fc", "away": "AS Tigre", "home_goals": 3, "away_goals": 2, "home_pts": 75.5, "away_pts": 72.5}, {"round": 4, "home": "PANTHERS", "away": "Taghazout", "home_goals": 1, "away_goals": 1, "home_pts": 71.5, "away_pts": 72.0}, {"round": 4, "home": "Archisquadra", "away": "Ac Derbolina", "home_goals": 0, "away_goals": 0, "home_pts": 64.0, "away_pts": 64.0}, {"round": 4, "home": "AS Tigre", "away": "Celta Vino", "home_goals": 1, "away_goals": 4, "home_pts": 67.5, "away_pts": 79.0}, {"round": 4, "home": "I Mugiwara", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 1, "home_pts": 67.0, "away_pts": 70.0}, {"round": 4, "home": "Mai Una Gioia", "away": "zullo", "home_goals": 1, "away_goals": 1, "home_pts": 69.0, "away_pts": 71.0}, {"round": 5, "home": "Ac Derbolina", "away": "AS Tigre", "home_goals": 1, "away_goals": 2, "home_pts": 66.0, "away_pts": 73.0}, {"round": 5, "home": "Celta Vino", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 1, "home_pts": 69.5, "away_pts": 69.5}, {"round": 5, "home": "zullo", "away": "Archisquadra", "home_goals": 5, "away_goals": 0, "home_pts": 82.0, "away_pts": 53.5}, {"round": 5, "home": "PANTHERS", "away": "I Mugiwara", "home_goals": 0, "away_goals": 1, "home_pts": 61.0, "away_pts": 71.0}, {"round": 5, "home": "Taghazout", "away": "Mai Una Gioia", "home_goals": 0, "away_goals": 0, "home_pts": 63.0, "away_pts": 62.0}, {"round": 6, "home": "AS Tigre", "away": "zullo", "home_goals": 4, "away_goals": 2, "home_pts": 79.5, "away_pts": 74.0}, {"round": 6, "home": "Archisquadra", "away": "Taghazout", "home_goals": 0, "away_goals": 0, "home_pts": 63.0, "away_pts": 65.5}, {"round": 6, "home": "I Mugiwara", "away": "Celta Vino", "home_goals": 1, "away_goals": 0, "home_pts": 66.0, "away_pts": 60.5}, {"round": 6, "home": "Mai Una Gioia", "away": "PANTHERS", "home_goals": 0, "away_goals": 2, "home_pts": 64.0, "away_pts": 72.5}, {"round": 6, "home": "Albinoloffie Fc", "away": "Ac Derbolina", "home_goals": 2, "away_goals": 3, "home_pts": 73.5, "away_pts": 76.5}, {"round": 7, "home": "Ac Derbolina", "away": "Celta Vino", "home_goals": 3, "away_goals": 1, "home_pts": 77.5, "away_pts": 66.5}, {"round": 7, "home": "PANTHERS", "away": "Archisquadra", "home_goals": 1, "away_goals": 7, "home_pts": 67.0, "away_pts": 87.5}, {"round": 7, "home": "Mai Una Gioia", "away": "I Mugiwara", "home_goals": 1, "away_goals": 4, "home_pts": 68.5, "away_pts": 80.0}, {"round": 7, "home": "zullo", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 1, "home_pts": 71.0, "away_pts": 66.0}, {"round": 7, "home": "Taghazout", "away": "AS Tigre", "home_goals": 1, "away_goals": 1, "home_pts": 70.0, "away_pts": 72.0}, {"round": 8, "home": "Ac Derbolina", "away": "I Mugiwara", "home_goals": 1, "away_goals": 2, "home_pts": 69.5, "away_pts": 73.5}, {"round": 8, "home": "AS Tigre", "away": "PANTHERS", "home_goals": 1, "away_goals": 0, "home_pts": 68.0, "away_pts": 57.5}, {"round": 8, "home": "Celta Vino", "away": "zullo", "home_goals": 2, "away_goals": 0, "home_pts": 73.5, "away_pts": 62.5}, {"round": 8, "home": "Archisquadra", "away": "Mai Una Gioia", "home_goals": 5, "away_goals": 0, "home_pts": 81.0, "away_pts": 59.0}, {"round": 8, "home": "Albinoloffie Fc", "away": "Taghazout", "home_goals": 2, "away_goals": 3, "home_pts": 73.0, "away_pts": 76.5}, {"round": 9, "home": "PANTHERS", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 1, "home_pts": 67.0, "away_pts": 70.5}, {"round": 9, "home": "zullo", "away": "Ac Derbolina", "home_goals": 0, "away_goals": 1, "home_pts": 64.5, "away_pts": 69.5}, {"round": 9, "home": "Taghazout", "away": "Celta Vino", "home_goals": 2, "away_goals": 1, "home_pts": 72.5, "away_pts": 67.5}, {"round": 9, "home": "I Mugiwara", "away": "Archisquadra", "home_goals": 0, "away_goals": 5, "home_pts": 63.5, "away_pts": 81.0}, {"round": 9, "home": "Mai Una Gioia", "away": "AS Tigre", "home_goals": 1, "away_goals": 1, "home_pts": 67.5, "away_pts": 67.0}, {"round": 10, "home": "PANTHERS", "away": "Celta Vino", "home_goals": 2, "away_goals": 2, "home_pts": 74.5, "away_pts": 72.5}, {"round": 10, "home": "I Mugiwara", "away": "zullo", "home_goals": 3, "away_goals": 0, "home_pts": 76.5, "away_pts": 52.5}, {"round": 10, "home": "Taghazout", "away": "Ac Derbolina", "home_goals": 1, "away_goals": 7, "home_pts": 69.0, "away_pts": 88.0}, {"round": 10, "home": "Archisquadra", "away": "AS Tigre", "home_goals": 1, "away_goals": 1, "home_pts": 66.5, "away_pts": 69.5}, {"round": 10, "home": "Mai Una Gioia", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 3, "home_pts": 68.0, "away_pts": 77.5}, {"round": 11, "home": "Ac Derbolina", "away": "PANTHERS", "home_goals": 2, "away_goals": 1, "home_pts": 74.5, "away_pts": 67.0}, {"round": 11, "home": "Albinoloffie Fc", "away": "Archisquadra", "home_goals": 2, "away_goals": 5, "home_pts": 73.5, "away_pts": 83.0}, {"round": 11, "home": "AS Tigre", "away": "I Mugiwara", "home_goals": 5, "away_goals": 1, "home_pts": 83.5, "away_pts": 70.0}, {"round": 11, "home": "zullo", "away": "Taghazout", "home_goals": 5, "away_goals": 1, "home_pts": 82.0, "away_pts": 70.0}, {"round": 11, "home": "Celta Vino", "away": "Mai Una Gioia", "home_goals": 1, "away_goals": 1, "home_pts": 71.5, "away_pts": 69.0}, {"round": 12, "home": "Mai Una Gioia", "away": "Ac Derbolina", "home_goals": 1, "away_goals": 4, "home_pts": 67.0, "away_pts": 79.0}, {"round": 12, "home": "PANTHERS", "away": "zullo", "home_goals": 0, "away_goals": 0, "home_pts": 65.5, "away_pts": 66.0}, {"round": 12, "home": "Archisquadra", "away": "Celta Vino", "home_goals": 3, "away_goals": 1, "home_pts": 75.5, "away_pts": 70.5}, {"round": 12, "home": "I Mugiwara", "away": "Taghazout", "home_goals": 1, "away_goals": 6, "home_pts": 71.5, "away_pts": 85.0}, {"round": 12, "home": "AS Tigre", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 2, "home_pts": 66.0, "away_pts": 72.0}, {"round": 13, "home": "Taghazout", "away": "PANTHERS", "home_goals": 1, "away_goals": 2, "home_pts": 68.5, "away_pts": 74.0}, {"round": 13, "home": "Celta Vino", "away": "AS Tigre", "home_goals": 0, "away_goals": 3, "home_pts": 59.0, "away_pts": 75.5}, {"round": 13, "home": "Albinoloffie Fc", "away": "I Mugiwara", "home_goals": 0, "away_goals": 4, "home_pts": 63.0, "away_pts": 80.5}, {"round": 13, "home": "Ac Derbolina", "away": "Archisquadra", "home_goals": 1, "away_goals": 0, "home_pts": 69.0, "away_pts": 65.0}, {"round": 13, "home": "zullo", "away": "Mai Una Gioia", "home_goals": 0, "away_goals": 0, "home_pts": 64.5, "away_pts": 62.5}, {"round": 14, "home": "AS Tigre", "away": "Ac Derbolina", "home_goals": 1, "away_goals": 2, "home_pts": 66.0, "away_pts": 73.0}, {"round": 14, "home": "Albinoloffie Fc", "away": "Celta Vino", "home_goals": 4, "away_goals": 4, "home_pts": 78.0, "away_pts": 78.0}, {"round": 14, "home": "I Mugiwara", "away": "PANTHERS", "home_goals": 1, "away_goals": 4, "home_pts": 68.5, "away_pts": 79.0}, {"round": 14, "home": "Archisquadra", "away": "zullo", "home_goals": 0, "away_goals": 1, "home_pts": 61.5, "away_pts": 67.0}, {"round": 14, "home": "Mai Una Gioia", "away": "Taghazout", "home_goals": 1, "away_goals": 0, "home_pts": 71.5, "away_pts": 61.0}, {"round": 15, "home": "zullo", "away": "AS Tigre", "home_goals": 1, "away_goals": 4, "home_pts": 67.5, "away_pts": 79.5}, {"round": 15, "home": "Taghazout", "away": "Archisquadra", "home_goals": 2, "away_goals": 1, "home_pts": 72.5, "away_pts": 68.5}, {"round": 15, "home": "Ac Derbolina", "away": "Albinoloffie Fc", "home_goals": 3, "away_goals": 7, "home_pts": 77.0, "away_pts": 89.0}, {"round": 15, "home": "Celta Vino", "away": "I Mugiwara", "home_goals": 1, "away_goals": 2, "home_pts": 70.5, "away_pts": 74.0}, {"round": 15, "home": "PANTHERS", "away": "Mai Una Gioia", "home_goals": 0, "away_goals": 3, "home_pts": 54.5, "away_pts": 76.5}, {"round": 16, "home": "Celta Vino", "away": "Ac Derbolina", "home_goals": 1, "away_goals": 1, "home_pts": 71.5, "away_pts": 72.0}, {"round": 16, "home": "Albinoloffie Fc", "away": "zullo", "home_goals": 0, "away_goals": 1, "home_pts": 64.0, "away_pts": 68.0}, {"round": 16, "home": "Archisquadra", "away": "PANTHERS", "home_goals": 1, "away_goals": 2, "home_pts": 66.5, "away_pts": 73.0}, {"round": 16, "home": "AS Tigre", "away": "Taghazout", "home_goals": 5, "away_goals": 1, "home_pts": 81.0, "away_pts": 66.5}, {"round": 16, "home": "I Mugiwara", "away": "Mai Una Gioia", "home_goals": 1, "away_goals": 1, "home_pts": 70.0, "away_pts": 67.5}, {"round": 17, "home": "I Mugiwara", "away": "Ac Derbolina", "home_goals": 0, "away_goals": 1, "home_pts": 64.5, "away_pts": 70.0}, {"round": 17, "home": "zullo", "away": "Celta Vino", "home_goals": 1, "away_goals": 1, "home_pts": 67.0, "away_pts": 67.0}, {"round": 17, "home": "Mai Una Gioia", "away": "Archisquadra", "home_goals": 4, "away_goals": 2, "home_pts": 80.5, "away_pts": 74.0}, {"round": 17, "home": "PANTHERS", "away": "AS Tigre", "home_goals": 1, "away_goals": 4, "home_pts": 67.5, "away_pts": 79.5}, {"round": 17, "home": "Taghazout", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 2, "home_pts": 70.5, "away_pts": 74.0}, {"round": 18, "home": "Ac Derbolina", "away": "zullo", "home_goals": 5, "away_goals": 2, "home_pts": 81.0, "away_pts": 74.0}, {"round": 18, "home": "Archisquadra", "away": "I Mugiwara", "home_goals": 5, "away_goals": 2, "home_pts": 82.5, "away_pts": 74.5}, {"round": 18, "home": "Albinoloffie Fc", "away": "PANTHERS", "home_goals": 1, "away_goals": 5, "home_pts": 70.5, "away_pts": 81.5}, {"round": 18, "home": "Celta Vino", "away": "Taghazout", "home_goals": 2, "away_goals": 1, "home_pts": 72.5, "away_pts": 69.5}, {"round": 18, "home": "AS Tigre", "away": "Mai Una Gioia", "home_goals": 1, "away_goals": 1, "home_pts": 69.5, "away_pts": 66.5}, {"round": 19, "home": "Ac Derbolina", "away": "Taghazout", "home_goals": 2, "away_goals": 1, "home_pts": 73.5, "away_pts": 67.5}, {"round": 19, "home": "Celta Vino", "away": "PANTHERS", "home_goals": 3, "away_goals": 1, "home_pts": 76.5, "away_pts": 67.0}, {"round": 19, "home": "zullo", "away": "I Mugiwara", "home_goals": 1, "away_goals": 0, "home_pts": 68.5, "away_pts": 63.5}, {"round": 19, "home": "AS Tigre", "away": "Archisquadra", "home_goals": 3, "away_goals": 2, "home_pts": 76.5, "away_pts": 73.5}, {"round": 19, "home": "Albinoloffie Fc", "away": "Mai Una Gioia", "home_goals": 2, "away_goals": 0, "home_pts": 72.5, "away_pts": 54.0}, {"round": 20, "home": "PANTHERS", "away": "Ac Derbolina", "home_goals": 1, "away_goals": 5, "home_pts": 66.5, "away_pts": 82.0}, {"round": 20, "home": "I Mugiwara", "away": "AS Tigre", "home_goals": 0, "away_goals": 4, "home_pts": 62.5, "away_pts": 80.0}, {"round": 20, "home": "Archisquadra", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 0, "home_pts": 70.5, "away_pts": 61.5}, {"round": 20, "home": "Taghazout", "away": "zullo", "home_goals": 5, "away_goals": 3, "home_pts": 83.5, "away_pts": 76.0}, {"round": 20, "home": "Mai Una Gioia", "away": "Celta Vino", "home_goals": 3, "away_goals": 1, "home_pts": 76.0, "away_pts": 68.0}, {"round": 21, "home": "Ac Derbolina", "away": "Mai Una Gioia", "home_goals": 3, "away_goals": 1, "home_pts": 76.0, "away_pts": 66.0}, {"round": 21, "home": "Celta Vino", "away": "Archisquadra", "home_goals": 1, "away_goals": 1, "home_pts": 70.5, "away_pts": 66.0}, {"round": 21, "home": "Taghazout", "away": "I Mugiwara", "home_goals": 1, "away_goals": 0, "home_pts": 70.0, "away_pts": 63.0}, {"round": 21, "home": "zullo", "away": "PANTHERS", "home_goals": 5, "away_goals": 0, "home_pts": 83.0, "away_pts": 57.5}, {"round": 21, "home": "Albinoloffie Fc", "away": "AS Tigre", "home_goals": 1, "away_goals": 2, "home_pts": 66.5, "away_pts": 74.5}, {"round": 22, "home": "PANTHERS", "away": "Taghazout", "home_goals": 5, "away_goals": 2, "home_pts": 83.0, "away_pts": 73.5}, {"round": 22, "home": "AS Tigre", "away": "Celta Vino", "home_goals": 4, "away_goals": 4, "home_pts": 79.5, "away_pts": 78.5}, {"round": 22, "home": "Archisquadra", "away": "Ac Derbolina", "home_goals": 1, "away_goals": 1, "home_pts": 67.0, "away_pts": 67.5}, {"round": 22, "home": "I Mugiwara", "away": "Albinoloffie Fc", "home_goals": 0, "away_goals": 8, "home_pts": 62.0, "away_pts": 92.5}, {"round": 22, "home": "Mai Una Gioia", "away": "zullo", "home_goals": 1, "away_goals": 0, "home_pts": 69.0, "away_pts": 58.0}, {"round": 23, "home": "Ac Derbolina", "away": "AS Tigre", "home_goals": 3, "away_goals": 1, "home_pts": 77.0, "away_pts": 69.0}, {"round": 23, "home": "Celta Vino", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 4, "home_pts": 71.0, "away_pts": 79.0}, {"round": 23, "home": "Taghazout", "away": "Mai Una Gioia", "home_goals": 0, "away_goals": 1, "home_pts": 60.0, "away_pts": 68.0}, {"round": 23, "home": "PANTHERS", "away": "I Mugiwara", "home_goals": 3, "away_goals": 0, "home_pts": 77.0, "away_pts": 56.5}, {"round": 23, "home": "zullo", "away": "Archisquadra", "home_goals": 1, "away_goals": 0, "home_pts": 69.5, "away_pts": 64.0}, {"round": 24, "home": "AS Tigre", "away": "zullo", "home_goals": 0, "away_goals": 2, "home_pts": 63.5, "away_pts": 73.5}, {"round": 24, "home": "I Mugiwara", "away": "Celta Vino", "home_goals": 1, "away_goals": 0, "home_pts": 66.5, "away_pts": 62.5}, {"round": 24, "home": "Archisquadra", "away": "Taghazout", "home_goals": 2, "away_goals": 1, "home_pts": 72.0, "away_pts": 66.5}, {"round": 24, "home": "Mai Una Gioia", "away": "PANTHERS", "home_goals": 0, "away_goals": 4, "home_pts": 64.5, "away_pts": 79.0}, {"round": 24, "home": "Albinoloffie Fc", "away": "Ac Derbolina", "home_goals": 1, "away_goals": 1, "home_pts": 70.0, "away_pts": 70.0}, {"round": 25, "home": "Ac Derbolina", "away": "Celta Vino", "home_goals": 1, "away_goals": 4, "home_pts": 67.0, "away_pts": 78.0}, {"round": 25, "home": "PANTHERS", "away": "Archisquadra", "home_goals": 1, "away_goals": 4, "home_pts": 69.0, "away_pts": 80.0}, {"round": 25, "home": "Taghazout", "away": "AS Tigre", "home_goals": 1, "away_goals": 3, "home_pts": 69.0, "away_pts": 76.0}, {"round": 25, "home": "zullo", "away": "Albinoloffie Fc", "home_goals": 1, "away_goals": 3, "home_pts": 70.0, "away_pts": 76.5}, {"round": 25, "home": "Mai Una Gioia", "away": "I Mugiwara", "home_goals": 3, "away_goals": 3, "home_pts": 75.0, "away_pts": 77.0}, {"round": 26, "home": "Celta Vino", "away": "zullo", "home_goals": 2, "away_goals": 0, "home_pts": 74.0, "away_pts": 54.0}, {"round": 26, "home": "AS Tigre", "away": "PANTHERS", "home_goals": 2, "away_goals": 1, "home_pts": 74.0, "away_pts": 70.5}, {"round": 26, "home": "Ac Derbolina", "away": "I Mugiwara", "home_goals": 1, "away_goals": 3, "home_pts": 68.0, "away_pts": 77.0}, {"round": 26, "home": "Archisquadra", "away": "Mai Una Gioia", "home_goals": 3, "away_goals": 4, "home_pts": 75.0, "away_pts": 80.0}, {"round": 26, "home": "Albinoloffie Fc", "away": "Taghazout", "home_goals": 0, "away_goals": 4, "home_pts": 63.5, "away_pts": 79.5}, {"round": 27, "home": "PANTHERS", "away": "Albinoloffie Fc", "home_goals": 0, "away_goals": 4, "home_pts": 65.5, "away_pts": 78.0}, {"round": 27, "home": "zullo", "away": "Ac Derbolina", "home_goals": 0, "away_goals": 4, "home_pts": 52.5, "away_pts": 78.5}, {"round": 27, "home": "I Mugiwara", "away": "Archisquadra", "home_goals": 0, "away_goals": 1, "home_pts": 64.5, "away_pts": 68.5}, {"round": 27, "home": "Taghazout", "away": "Celta Vino", "home_goals": 2, "away_goals": 2, "home_pts": 72.0, "away_pts": 74.5}, {"round": 27, "home": "Mai Una Gioia", "away": "AS Tigre", "home_goals": 1, "away_goals": 5, "home_pts": 67.5, "away_pts": 83.0}, {"round": 28, "home": "Taghazout", "away": "Ac Derbolina", "home_goals": 0, "away_goals": 0, "home_pts": 62.5, "away_pts": 61.5}, {"round": 28, "home": "I Mugiwara", "away": "zullo", "home_goals": 2, "away_goals": 1, "home_pts": 73.5, "away_pts": 67.5}, {"round": 28, "home": "PANTHERS", "away": "Celta Vino", "home_goals": 3, "away_goals": 3, "home_pts": 78.0, "away_pts": 76.5}, {"round": 28, "home": "Archisquadra", "away": "AS Tigre", "home_goals": 1, "away_goals": 3, "home_pts": 70.5, "away_pts": 75.5}, {"round": 28, "home": "Mai Una Gioia", "away": "Albinoloffie Fc", "home_goals": 0, "away_goals": 2, "home_pts": 65.5, "away_pts": 73.5}, {"round": 29, "home": "Ac Derbolina", "away": "PANTHERS", "home_goals": 0, "away_goals": 2, "home_pts": 64.0, "away_pts": 73.0}, {"round": 29, "home": "Albinoloffie Fc", "away": "Archisquadra", "home_goals": 1, "away_goals": 4, "home_pts": 66.5, "away_pts": 78.5}, {"round": 29, "home": "zullo", "away": "Taghazout", "home_goals": 0, "away_goals": 1, "home_pts": 64.0, "away_pts": 68.5}, {"round": 29, "home": "AS Tigre", "away": "I Mugiwara", "home_goals": 3, "away_goals": 3, "home_pts": 78.0, "away_pts": 77.0}, {"round": 29, "home": "Celta Vino", "away": "Mai Una Gioia", "home_goals": 2, "away_goals": 3, "home_pts": 72.0, "away_pts": 75.5}, {"round": 30, "home": "Mai Una Gioia", "away": "Ac Derbolina", "home_goals": 2, "away_goals": 1, "home_pts": 73.5, "away_pts": 67.5}, {"round": 30, "home": "Archisquadra", "away": "Celta Vino", "home_goals": 0, "away_goals": 0, "home_pts": 64.0, "away_pts": 64.0}, {"round": 30, "home": "PANTHERS", "away": "zullo", "home_goals": 2, "away_goals": 0, "home_pts": 74.0, "away_pts": 61.0}, {"round": 30, "home": "I Mugiwara", "away": "Taghazout", "home_goals": 5, "away_goals": 3, "home_pts": 82.5, "away_pts": 75.0}, {"round": 30, "home": "AS Tigre", "away": "Albinoloffie Fc", "home_goals": 5, "away_goals": 8, "home_pts": 82.0, "away_pts": 91.0}, {"round": 31, "home": "Taghazout", "away": "PANTHERS", "home_goals": 0, "away_goals": 0, "home_pts": 65.5, "away_pts": 58.0}, {"round": 31, "home": "Celta Vino", "away": "AS Tigre", "home_goals": 4, "away_goals": 1, "home_pts": 78.5, "away_pts": 67.5}, {"round": 31, "home": "Ac Derbolina", "away": "Archisquadra", "home_goals": 1, "away_goals": 2, "home_pts": 67.5, "away_pts": 72.0}, {"round": 31, "home": "Albinoloffie Fc", "away": "I Mugiwara", "home_goals": 2, "away_goals": 1, "home_pts": 74.5, "away_pts": 70.5}, {"round": 31, "home": "zullo", "away": "Mai Una Gioia", "home_goals": 1, "away_goals": 2, "home_pts": 69.5, "away_pts": 74.0}], "progression": {"AS Tigre": [0, 0, 0, 0, 3, 6, 7, 10, 11, 12, 15, 15, 18, 18, 21, 24, 27, 28, 31, 34, 37, 38, 38, 38, 41, 44, 47, 50, 51, 51, 51], "Ac Derbolina": [3, 6, 9, 10, 10, 13, 16, 16, 19, 22, 25, 28, 31, 34, 34, 35, 38, 41, 44, 47, 50, 51, 54, 55, 55, 55, 58, 59, 59, 59, 59], "Albinoloffie Fc": [0, 0, 3, 4, 5, 5, 6, 6, 7, 10, 10, 13, 13, 14, 17, 17, 20, 20, 23, 23, 23, 26, 29, 30, 33, 33, 36, 39, 39, 42, 45], "Archisquadra": [3, 6, 6, 7, 7, 8, 11, 14, 17, 18, 21, 24, 24, 24, 24, 24, 24, 27, 27, 30, 31, 32, 32, 35, 38, 38, 41, 41, 44, 45, 48], "Celta Vino": [3, 6, 9, 12, 13, 13, 13, 16, 16, 17, 18, 18, 18, 19, 19, 20, 21, 24, 27, 27, 28, 29, 29, 29, 32, 35, 36, 37, 37, 38, 41], "I Mugiwara": [0, 3, 3, 4, 7, 10, 13, 16, 16, 19, 19, 19, 22, 22, 25, 26, 26, 26, 26, 26, 26, 26, 26, 29, 30, 33, 33, 36, 37, 40, 40], "Mai Una Gioia": [3, 3, 3, 4, 5, 5, 5, 5, 6, 6, 7, 7, 8, 11, 14, 15, 18, 19, 19, 22, 22, 25, 28, 28, 29, 32, 32, 32, 35, 38, 41], "PANTHERS": [0, 0, 1, 2, 2, 5, 5, 5, 6, 7, 7, 8, 11, 14, 14, 17, 17, 20, 20, 20, 20, 23, 26, 29, 29, 29, 29, 30, 33, 36, 37], "Taghazout": [0, 3, 6, 7, 8, 9, 10, 13, 16, 16, 16, 19, 19, 19, 22, 22, 22, 22, 22, 25, 28, 28, 28, 28, 28, 31, 32, 33, 36, 36, 37], "zullo": [3, 3, 4, 5, 8, 8, 9, 9, 9, 9, 12, 13, 14, 17, 17, 20, 21, 21, 24, 24, 27, 27, 30, 33, 33, 33, 33, 33, 33, 33, 33]}, "rounds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]};
+
+const COLORS = {
+  'Ac Derbolina': '#f5c842', 'AS Tigre': '#f05454', 'Archisquadra': '#4f8ef7',
+  'Albinoloffie Fc': '#30d474', 'Celta Vino': '#a855f7', 'Mai Una Gioia': '#f97316',
+  'I Mugiwara': '#22d3ee', 'Taghazout': '#ec4899', 'PANTHERS': '#84cc16', 'zullo': '#94a3b8'
+};
+
+// PODIUM
+function renderPodium() {
+  const top3 = DATA.standings.slice(0, 3);
+  const cls = ['gold','silver','bronze'];
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('podium').innerHTML = top3.map((s, i) => `
+    <div class="podium-item ${cls[i]}">
+      <div class="podium-rank">${medals[i]}</div>
+      <div class="podium-team">${s.team}</div>
+      <div class="podium-pts">${s.pts} <span style="font-size:0.9rem;color:var(--muted)">pt</span></div>
+      <div class="podium-sub">${s.w}V ${s.d}P ${s.l}S · GF: ${s.gf} GA: ${s.ga}</div>
+    </div>`).join('');
+}
+
+// STANDINGS TABLE
+function renderStandings() {
+  const rows = DATA.standings.map(s => {
+    const gdClass = s.gd > 0 ? 'gd-pos' : s.gd < 0 ? 'gd-neg' : 'gd-zero';
+    const gdStr = s.gd > 0 ? `+${s.gd}` : `${s.gd}`;
+    const form = s.form.map(f => `<div class="form-pill form-${f}">${f}</div>`).join('');
+    const maxGf = Math.max(...DATA.standings.map(x=>x.gf));
+    const bar = `<div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${s.gf/maxGf*100}%;background:${COLORS[s.team]}"></div></div><div class="bar-val">${s.gf}</div></div>`;
+    const rankCls = s.rank <= 3 ? `rank-${s.rank}` : '';
+    return `<tr class="${s.rank===1?'highlight-row':''}">
+      <td><div class="rank-num ${rankCls}">${s.rank}</div></td>
+      <td><div class="team-name">${s.team}</div></td>
+      <td class="pts-cell">${s.pts}</td>
+      <td>${s.p}</td>
+      <td style="color:var(--green)">${s.w}</td>
+      <td style="color:var(--draw)">${s.d}</td>
+      <td style="color:var(--red)">${s.l}</td>
+      <td>${bar}</td>
+      <td>${s.ga}</td>
+      <td class="${gdClass}">${gdStr}</td>
+      <td style="color:var(--accent)">${s.avg_fpts}</td>
+      <td><div class="form">${form}</div></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('standingsTable').innerHTML = `
+    <thead><tr>
+      <th>#</th><th>Squadra</th><th>Pt</th><th>G</th>
+      <th>V</th><th>P</th><th>S</th>
+      <th>GF</th><th>GS</th><th>GD</th>
+      <th>AvgFP</th><th>Forma</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>`;
+}
+
+// CHARTS
+let progressionChart, avgPtsChart, wdlChart, goalBarChart;
+
+function buildProgressionChart(filtered) {
+  const ctx = document.getElementById('progressionChart').getContext('2d');
+  if (progressionChart) progressionChart.destroy();
+  
+  const teams = filtered === 'all' ? Object.keys(DATA.progression) : [filtered];
+  const datasets = teams.map(t => ({
+    label: t, data: DATA.progression[t],
+    borderColor: COLORS[t], backgroundColor: COLORS[t]+'22',
+    borderWidth: filtered === 'all' ? 1.5 : 3,
+    pointRadius: filtered === 'all' ? 0 : 4,
+    tension: 0.4, fill: filtered !== 'all'
+  }));
+
+  progressionChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: DATA.rounds, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#6b7280', font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#6b7280', font: {size:10} }, grid: { color: '#252a3d' } },
+        y: { ticks: { color: '#6b7280' }, grid: { color: '#252a3d' } }
+      }
+    }
+  });
+}
+
+function buildAvgPtsChart() {
+  const ctx = document.getElementById('avgPtsChart').getContext('2d');
+  const sorted = [...DATA.standings].sort((a,b) => b.avg_fpts - a.avg_fpts);
+  avgPtsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: sorted.map(s => s.team),
+      datasets: [{ data: sorted.map(s => s.avg_fpts),
+        backgroundColor: sorted.map(s => COLORS[s.team]+'99'),
+        borderColor: sorted.map(s => COLORS[s.team]),
+        borderWidth: 1, borderRadius: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#6b7280', font:{size:9}, maxRotation: 45 }, grid: { color: '#252a3d' } },
+        y: { ticks: { color: '#6b7280' }, grid: { color: '#252a3d' }, min: 65 }
+      }
+    }
+  });
+}
+
+function buildWdlChart() {
+  const ctx = document.getElementById('wdlChart').getContext('2d');
+  const sorted = [...DATA.standings].sort((a,b)=>b.pts-a.pts);
+  wdlChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: sorted.map(s=>s.team),
+      datasets: [
+        { label:'Vittorie', data: sorted.map(s=>s.w), backgroundColor:'#30d47499', borderColor:'#30d474', borderWidth:1, borderRadius:4 },
+        { label:'Pareggi', data: sorted.map(s=>s.d), backgroundColor:'#f5c84299', borderColor:'#f5c842', borderWidth:1, borderRadius:4 },
+        { label:'Sconfitte', data: sorted.map(s=>s.l), backgroundColor:'#f0545499', borderColor:'#f05454', borderWidth:1, borderRadius:4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels:{color:'#6b7280',font:{size:10}} } },
+      scales: {
+        x: { stacked:true, ticks:{color:'#6b7280',font:{size:9},maxRotation:45}, grid:{color:'#252a3d'} },
+        y: { stacked:true, ticks:{color:'#6b7280'}, grid:{color:'#252a3d'} }
+      }
+    }
+  });
+}
+
+function buildGoalBarChart() {
+  const ctx = document.getElementById('goalBarChart').getContext('2d');
+  const sorted = [...DATA.standings].sort((a,b)=>b.gf-a.gf);
+  goalBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: sorted.map(s=>s.team),
+      datasets: [
+        { label:'Gol Fatti', data:sorted.map(s=>s.gf), backgroundColor:'#4f8ef799', borderColor:'#4f8ef7', borderWidth:1, borderRadius:4 },
+        { label:'Gol Subiti', data:sorted.map(s=>-s.ga), backgroundColor:'#f0545499', borderColor:'#f05454', borderWidth:1, borderRadius:4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{labels:{color:'#6b7280',font:{size:11}}} },
+      scales: {
+        x: { ticks:{color:'#6b7280',font:{size:9},maxRotation:45}, grid:{color:'#252a3d'} },
+        y: { ticks:{color:'#6b7280',callback:v=>Math.abs(v)}, grid:{color:'#252a3d'} }
+      }
+    }
+  });
+}
+
+function updateProgressionChart() {
+  buildProgressionChart(document.getElementById('teamFilter').value);
+}
+
+// STATS LISTS
+function renderStatLists() {
+  const byGf = [...DATA.standings].sort((a,b)=>b.gf-a.gf);
+  const byGa = [...DATA.standings].sort((a,b)=>a.ga-b.ga);
+  const byFpts = [...DATA.standings].sort((a,b)=>b.avg_fpts-a.avg_fpts);
+  const maxGf = byGf[0].gf, maxGa = byGa[byGa.length-1].ga;
+  const maxFpts = byFpts[0].avg_fpts;
+
+  document.getElementById('goalsScoredList').innerHTML = byGf.map((s,i) => `
+    <div class="stat-item">
+      <div class="srank">${i+1}</div>
+      <div class="sname">${s.team}</div>
+      <div class="bar-bg" style="max-width:80px"><div class="bar-fill" style="width:${s.gf/maxGf*100}%;background:${COLORS[s.team]}"></div></div>
+      <div class="sval">${s.gf}</div>
+    </div>`).join('');
+
+  document.getElementById('goalsConcededList').innerHTML = byGa.map((s,i) => `
+    <div class="stat-item">
+      <div class="srank">${i+1}</div>
+      <div class="sname">${s.team}</div>
+      <div class="bar-bg" style="max-width:80px"><div class="bar-fill" style="width:${s.ga/maxGa*100}%;background:${COLORS[s.team]}"></div></div>
+      <div class="sval">${s.ga}</div>
+    </div>`).join('');
+
+  document.getElementById('avgFptsList').innerHTML = byFpts.map((s,i) => `
+    <div class="stat-item">
+      <div class="srank">${i+1}</div>
+      <div class="sname">${s.team}</div>
+      <div class="bar-bg" style="max-width:80px"><div class="bar-fill" style="width:${s.avg_fpts/maxFpts*100}%;background:${COLORS[s.team]}"></div></div>
+      <div class="sval">${s.avg_fpts}</div>
+    </div>`).join('');
+}
+
+// RECORDS
+function renderRecords() {
+  const matches = DATA.matches;
+  
+  // Biggest win
+  let maxGoalDiff = 0, biggestWin = null;
+  matches.forEach(m => {
+    const diff = Math.abs(m.home_goals - m.away_goals);
+    if (diff > maxGoalDiff) { maxGoalDiff = diff; biggestWin = m; }
+  });
+  
+  // Highest scoring match
+  let maxGoals = 0, highScoring = null;
+  matches.forEach(m => {
+    const tot = m.home_goals + m.away_goals;
+    if (tot > maxGoals) { maxGoals = tot; highScoring = m; }
+  });
+
+  // Highest fpts in single match
+  let maxFpts = 0, bestFptsMatch = null, bestFptsTeam = '';
+  matches.forEach(m => {
+    if (m.home_pts > maxFpts) { maxFpts = m.home_pts; bestFptsMatch = m; bestFptsTeam = m.home; }
+    if (m.away_pts > maxFpts) { maxFpts = m.away_pts; bestFptsMatch = m; bestFptsTeam = m.away; }
+  });
+
+  // Longest win streak per team
+  let bestStreak = 0, bestStreakTeam = '';
+  DATA.standings.forEach(s => {
+    const teamMatches = matches.filter(m => m.home===s.team||m.away===s.team).sort((a,b)=>a.round-b.round);
+    let streak = 0, max = 0;
+    teamMatches.forEach(m => {
+      const won = (m.home===s.team && m.home_goals>m.away_goals) || (m.away===s.team && m.away_goals>m.home_goals);
+      streak = won ? streak+1 : 0;
+      if (streak>max) max=streak;
+    });
+    if (max > bestStreak) { bestStreak = max; bestStreakTeam = s.team; }
+  });
+
+  const records = [
+    { icon: '💥', label: 'Vittoria più larga', value: `${biggestWin.home} ${biggestWin.home_goals}-${biggestWin.away_goals} ${biggestWin.away}`, sub: `Giornata ${biggestWin.round}` },
+    { icon: '🎭', label: 'Partita più spettacolare', value: `${highScoring.home} ${highScoring.home_goals}-${highScoring.away_goals} ${highScoring.away}`, sub: `${maxGoals} gol totali — G${highScoring.round}` },
+    { icon: '⭐', label: 'Miglior fantapunti singola gara', value: `${bestFptsTeam}: ${maxFpts} pt`, sub: `G${bestFptsMatch.round}: ${bestFptsMatch.home} vs ${bestFptsMatch.away}` },
+    { icon: '🔥', label: 'Serie vittorie consecutiva', value: `${bestStreakTeam}: ${bestStreak} vittorie`, sub: 'Record stagionale' },
+    { icon: '📉', label: 'Peggiore difesa', value: `I Mugiwara: 70 gol subiti`, sub: 'Peggior GA del campionato' },
+    { icon: '🎯', label: 'Capocannonieri (gol fatti)', value: `AS Tigre: 73 gol`, sub: 'Top scorer del torneo' },
+  ];
+
+  document.getElementById('recordsList').innerHTML = records.map(r => `
+    <div style="display:flex;align-items:flex-start;gap:0.8rem;padding:0.6rem;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border)">
+      <div style="font-size:1.3rem;line-height:1.2">${r.icon}</div>
+      <div>
+        <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px">${r.label}</div>
+        <div style="font-size:0.88rem;font-weight:600;margin-top:2px">${r.value}</div>
+        <div style="font-size:0.72rem;color:var(--muted)">${r.sub}</div>
+      </div>
+    </div>`).join('');
+}
+
+// RESULTS
+function renderResults() {
+  const filter = document.getElementById('resultTeamFilter').value;
+  const rounds = [...new Set(DATA.matches.map(m=>m.round))].sort((a,b)=>b-a);
+  
+  let html = '';
+  rounds.forEach(r => {
+    let rMatches = DATA.matches.filter(m => m.round===r);
+    if (filter !== 'all') rMatches = rMatches.filter(m => m.home===filter || m.away===filter);
+    if (!rMatches.length) return;
+    
+    const matchHtml = rMatches.map(m => {
+      const hw = m.home_goals > m.away_goals, aw = m.away_goals > m.home_goals;
+      const hcls = hw ? 'w-color' : (aw ? 'l-color' : '');
+      const acls = aw ? 'w-color' : (hw ? 'l-color' : '');
+      return `<div class="match-row">
+        <div class="match-home ${hcls}">${m.home}</div>
+        <div class="match-pts">${m.home_pts}</div>
+        <div class="match-score">${m.home_goals} – ${m.away_goals}</div>
+        <div class="match-pts">${m.away_pts}</div>
+        <div class="match-away ${acls}">${m.away}</div>
+      </div>`;
+    }).join('');
+
+    html += `<div class="results-round">
+      <div class="round-header">⚽ Giornata ${r}</div>
+      <div class="match-list">${matchHtml}</div>
+    </div>`;
+  });
+  document.getElementById('resultsList').innerHTML = html;
+}
+
+// TEAM FILTERS
+function populateFilters() {
+  const teams = DATA.standings.map(s=>s.team);
+  ['teamFilter','resultTeamFilter'].forEach(id => {
+    const sel = document.getElementById(id);
+    teams.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+// TAB SWITCHING
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+
+  // Lazy init charts
+  if (id === 'andamento' && !progressionChart) {
+    setTimeout(() => { buildProgressionChart('all'); buildAvgPtsChart(); buildWdlChart(); }, 50);
+  }
+  if (id === 'statistiche' && !goalBarChart) {
+    setTimeout(() => { buildGoalBarChart(); }, 50);
+  }
+}
+
+// INIT
+renderPodium();
+renderStandings();
+renderStatLists();
+renderRecords();
+renderResults();
+populateFilters();
+</script>
+
+</body>
+</html>
