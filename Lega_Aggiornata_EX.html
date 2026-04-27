@@ -66,9 +66,8 @@ border-radius: 12px; padding: 0.5rem 1rem; text-align: center; flex-shrink: 0;
 
 /* TABS */
 .tabs { background: var(–surface); border-bottom: 1px solid var(–border); position: sticky; top: 0; z-index: 100; }
-.tabs-inner { max-width: 1300px; margin: 0 auto; display: flex; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.tabs-inner::-webkit-scrollbar { display: none; }
-.tab { padding: 1rem 1.2rem; cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(–muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+.tabs-inner { max-width: 1300px; margin: 0 auto; display: flex; gap: 0; }
+.tab { padding: 1rem 1.5rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(–muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid transparent; transition: all 0.2s; }
 .tab:hover { color: var(–text); }
 .tab.active { color: var(–accent); border-bottom-color: var(–accent); }
 
@@ -132,34 +131,6 @@ border-radius: 12px; padding: 0.5rem 1rem; text-align: center; flex-shrink: 0;
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
 @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .podium { flex-direction: column; } }
 
-/* MOBILE HEADER */
-@media (max-width: 600px) {
-header { padding: 1.2rem 1rem 1rem; }
-header::before { font-size: 6rem; }
-.badge { width: 48px; height: 48px; font-size: 1.2rem; border-radius: 12px; }
-header h1 { font-size: 1.6rem; }
-header p { font-size: 0.75rem; }
-.rounds-badge { padding: 0.4rem 0.7rem; }
-.rounds-badge .num { font-size: 1.5rem; }
-.content { padding: 1rem; }
-.card { padding: 1rem; }
-.chart-wrap { height: 240px; }
-}
-
-/* MOBILE TABLE — hide some columns */
-@media (max-width: 600px) {
-.standings-table .hide-mobile { display: none; }
-.standings-table th, .standings-table td { padding: 0.55rem 0.4rem; font-size: 0.78rem; }
-.pts-cell { font-size: 1.1rem; }
-.rank-num { font-size: 1rem; width: 24px; }
-.match-row { font-size: 0.75rem; padding: 0.5rem 0.6rem; flex-wrap: wrap; gap: 2px; }
-.match-score { width: 60px; font-size: 0.95rem; }
-.match-pts { width: 55px; font-size: 0.65rem; }
-.podium-rank { font-size: 2.5rem; }
-.podium-pts { font-size: 1.5rem; }
-.podium-item { padding: 1rem; }
-}
-
 /* STAT CARDS */
 .stat-row { display: flex; flex-direction: column; gap: 0.75rem; }
 .stat-item { display: flex; align-items: center; gap: 0.75rem; }
@@ -214,12 +185,12 @@ font-family: ‘DM Sans’, sans-serif;
   </div>
 </header>
 
-  <div class="tabs">
+<div class="tabs">
   <div class="tabs-inner">
-    <div class="tab active" data-tab="classifica" onclick="showTab('classifica')">🏆 Classifica</div>
-    <div class="tab" data-tab="andamento" onclick="showTab('andamento')">📈 Andamento</div>
-    <div class="tab" data-tab="statistiche" onclick="showTab('statistiche')">📊 Statistiche</div>
-    <div class="tab" data-tab="risultati" onclick="showTab('risultati')">⚽ Risultati</div>
+    <div class="tab active" onclick="showTab('classifica')">🏆 Classifica</div>
+    <div class="tab" onclick="showTab('andamento')">📈 Andamento</div>
+    <div class="tab" onclick="showTab('statistiche')">📊 Statistiche</div>
+    <div class="tab" onclick="showTab('risultati')">⚽ Risultati</div>
   </div>
 </div>
 
@@ -337,24 +308,24 @@ function renderStandings() {
       <td><div class="rank-num ${rankCls}">${s.rank}</div></td>
       <td><div class="team-name">${s.team}</div></td>
       <td class="pts-cell">${s.pts}</td>
-      <td class="hide-mobile">${s.p}</td>
+      <td>${s.p}</td>
       <td style="color:var(--green)">${s.w}</td>
-      <td class="hide-mobile" style="color:var(--draw)">${s.d}</td>
+      <td style="color:var(--draw)">${s.d}</td>
       <td style="color:var(--red)">${s.l}</td>
       <td>${bar}</td>
-      <td class="hide-mobile">${s.ga}</td>
-      <td class="hide-mobile" class="${gdClass}">${gdStr}</td>
-      <td class="hide-mobile" style="color:var(--accent)">${s.avg_fpts}</td>
+      <td>${s.ga}</td>
+      <td class="${gdClass}">${gdStr}</td>
+      <td style="color:var(--accent)">${s.avg_fpts}</td>
       <td><div class="form">${form}</div></td>
     </tr>`;
   }).join('');
 
   document.getElementById('standingsTable').innerHTML = `
     <thead><tr>
-      <th>#</th><th>Squadra</th><th>Pt</th><th class="hide-mobile">G</th>
-      <th>V</th><th class="hide-mobile">P</th><th>S</th>
-      <th>GF</th><th class="hide-mobile">GS</th><th class="hide-mobile">GD</th>
-      <th class="hide-mobile">AvgFP</th><th>Forma</th>
+      <th>#</th><th>Squadra</th><th>Pt</th><th>G</th>
+      <th>V</th><th>P</th><th>S</th>
+      <th>GF</th><th>GS</th><th>GD</th>
+      <th>AvgFP</th><th>Forma</th>
     </tr></thead>
     <tbody>${rows}</tbody>`;
 }
@@ -599,22 +570,12 @@ function populateFilters() {
   });
 }
 
-// TAB SWITCHING — con supporto hash URL
-const VALID_TABS = ['classifica', 'andamento', 'statistiche', 'risultati'];
-
-function showTab(id, pushState) {
-  if (!VALID_TABS.includes(id)) id = 'classifica';
-
+// TAB SWITCHING
+function showTab(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const activeTab = document.querySelector(`.tab[data-tab="${id}"]`);
-  if (activeTab) activeTab.classList.add('active');
-
-  // Aggiorna hash nell'URL senza ricaricare la pagina
-  if (pushState !== false) {
-    history.replaceState(null, '', '#' + id);
-  }
+  event.target.classList.add('active');
 
   // Lazy init charts
   if (id === 'andamento' && !progressionChart) {
@@ -625,12 +586,6 @@ function showTab(id, pushState) {
   }
 }
 
-// Ascolta cambio hash (pulsante Back/Forward del browser)
-window.addEventListener('hashchange', () => {
-  const hash = window.location.hash.replace('#', '');
-  showTab(hash, false);
-});
-
 // INIT
 renderPodium();
 renderStandings();
@@ -638,10 +593,6 @@ renderStatLists();
 renderRecords();
 renderResults();
 populateFilters();
-
-// Apri il tab dall'hash URL (es. #andamento) oppure classifica di default
-const initHash = window.location.hash.replace('#', '');
-showTab(VALID_TABS.includes(initHash) ? initHash : 'classifica', false);
 </script>
 
 </body>
