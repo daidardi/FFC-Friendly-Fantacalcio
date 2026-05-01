@@ -367,7 +367,7 @@ let progressionChart, avgPtsChart, wdlChart, goalBarChart;
 function buildProgressionChart(filtered) {
   const ctx = document.getElementById('progressionChart').getContext('2d');
   if (progressionChart) progressionChart.destroy();
- 
+  
   const teams = filtered === 'all' ? Object.keys(DATA.progression) : [filtered];
   const datasets = teams.map(t => ({
     label: t, data: DATA.progression[t],
@@ -501,14 +501,14 @@ function renderStatLists() {
 // RECORDS
 function renderRecords() {
   const matches = DATA.matches;
- 
+  
   // Biggest win
   let maxGoalDiff = 0, biggestWin = null;
   matches.forEach(m => {
     const diff = Math.abs(m.home_goals - m.away_goals);
     if (diff > maxGoalDiff) { maxGoalDiff = diff; biggestWin = m; }
   });
- 
+  
   // Highest scoring match
   let maxGoals = 0, highScoring = null;
   matches.forEach(m => {
@@ -560,13 +560,13 @@ function renderRecords() {
 function renderResults() {
   const filter = document.getElementById('resultTeamFilter').value;
   const rounds = [...new Set(DATA.matches.map(m=>m.round))].sort((a,b)=>b-a);
- 
+  
   let html = '';
   rounds.forEach(r => {
     let rMatches = DATA.matches.filter(m => m.round===r);
     if (filter !== 'all') rMatches = rMatches.filter(m => m.home===filter || m.away===filter);
     if (!rMatches.length) return;
-   
+    
     const matchHtml = rMatches.map(m => {
       const hw = m.home_goals > m.away_goals, aw = m.away_goals > m.home_goals;
       const hcls = hw ? 'w-color' : (aw ? 'l-color' : '');
