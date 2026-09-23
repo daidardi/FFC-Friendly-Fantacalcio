@@ -49,7 +49,7 @@ $Destinatari = @(
 )
 
 
-$Oggetto = "⚽ Statistiche FFC 2026/27 - Aggiornamento"
+$Oggetto = "Statistiche FFC 2026/27 - Aggiornamento"
 
 $LinkStatistiche = "https://daidardi.github.io/FFC-Friendly-Fantacalcio/Lega_Aggiornata.html"
 
