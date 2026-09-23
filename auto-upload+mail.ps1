@@ -30,12 +30,26 @@ $Mittente = "andi.outbox.home@gmail.com"
 # ============================================================
 
 $Destinatari = @(
-    "DAIDARDI <daidardi@gmail.com>"
-    "CALIMERO <putiferio.mobile@gmail.com>"
+    "Angelo De Pala - I Mugiwara <angeloerino@hotmail.it>"
+	"Angelo De Pala - I Mugiwara <michelelamacchia9@gmail.com>"
+	"Antonello Fallacara - Mai Una Gioia <zantea89@live.it>"
+	"Antongiulio Minenna - Zullo <antongiuliom@live.it>"
+	"Antonio D'Ingiandi - AC Derbolina <antonio.dingiandi+FFC@gmail.com>"
+	"Antonio D'Ingiandi - AC Derbolina <putiferio.mobile@gmail.com>"
+	"Antonio Miraglia - Archisquadra <salvamiraglia@alice.it>"
+	"Antonio Miraglia - Archisquadra <simonagonnella@hotmail.it>"
+	"Gaetano Schiraldi - AS Tigre <schiraldigaetano@gmail.com>"
+	"Giuseppe Carbone - IASPORTZNGEY <giuseppecarbone.juris@gmail.com>"
+	"Giuseppe Perilli - Celta Vino <giusepppeperillli@gmail.com>"
+	"Sergio Panzarino - Albinoloffie Fc <games_world@hotmail.it>"
+	"Sergio Panzarino - Albinoloffie Fc <sergio.panzarino@gmail.com>"
+	"Vito Shiraldi - EAGLE <vitoschiraldiskizzo@gmail.com>"
+	"SQUADRA - TEST <putiferio@icloud.com>"
+    "SQUADRA - TEST <daidardi@gmail.com>"
 )
 
 
-$Oggetto = "Statistiche FFC 2026/27 - Aggiornamento"
+$Oggetto = "⚽ Statistiche FFC 2026/27 - Aggiornamento"
 
 $LinkStatistiche = "https://daidardi.github.io/FFC-Friendly-Fantacalcio/Lega_Aggiornata.html"
 
