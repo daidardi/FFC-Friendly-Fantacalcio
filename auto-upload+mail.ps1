@@ -324,6 +324,8 @@ catch {
     Write-Host ""
 
     Write-Host $_.Exception.Message -ForegroundColor Red
+
+    $InvioFallito = $true
 }
 
 
@@ -343,3 +345,8 @@ $Config = $null
 Write-Host ""
 Write-Host "Operazione terminata." -ForegroundColor Green
 Write-Host ""
+
+if ($InvioFallito) {
+
+    exit 1
+}

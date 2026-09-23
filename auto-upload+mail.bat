@@ -2,4 +2,4 @@
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0auto-upload+mail.ps1"
 
-pause
+if errorlevel 1 pause
