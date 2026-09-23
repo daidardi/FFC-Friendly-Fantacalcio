@@ -1,5 +1,4 @@
-```powershell
-# ============================================================
+﻿# ============================================================
 # FFC - AGGIORNAMENTO GITHUB + INVIO EMAIL
 # ============================================================
 
@@ -254,19 +253,19 @@ $Config = New-Object -ComObject CDO.Configuration
 # CONFIGURAZIONE SMTP GMAIL
 # ============================================================
 
-$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2
+$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing").Value = 2
 
-$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "smtp.gmail.com"
+$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver").Value = "smtp.gmail.com"
 
-$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 465
+$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport").Value = 465
 
-$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpusessl") = $true
+$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpusessl").Value = $true
 
-$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate") = 1
+$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate").Value = 1
 
-$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername") = "andi.outbox.home@gmail.com"
+$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername").Value = "andi.outbox.home@gmail.com"
 
-$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword") = "ymdzjmluxdrjaxvf"
+$Config.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword").Value = "ymdzjmluxdrjaxvf"
 
 $Config.Fields.Update()
 
@@ -288,10 +287,7 @@ $Mail.HTMLBody = $HtmlEmail
 # AGGIUNTA DESTINATARI
 # ============================================================
 
-foreach ($Destinatario in $Destinatari) {
-
-    $Mail.To = $Mail.To + $Destinatario + ";"
-}
+$Mail.To = ($Destinatari -join ", ")
 
 
 # ============================================================
@@ -347,4 +343,3 @@ $Config = $null
 Write-Host ""
 Write-Host "Operazione terminata." -ForegroundColor Green
 Write-Host ""
-```
