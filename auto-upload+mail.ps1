@@ -1,5 +1,4 @@
-﻿```powershell
-# ============================================================
+﻿# ============================================================
 # FFC - AGGIORNAMENTO GITHUB + INVIO EMAIL
 # ============================================================
 
@@ -348,4 +347,3 @@ finally {
 Write-Host ""
 Write-Host "Operazione terminata." -ForegroundColor Green
 Write-Host ""
-```
